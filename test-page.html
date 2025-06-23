@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Stack Analyzer - 测试页面</title>
+    
+    <!-- 模拟各种技术栈特征 -->
+    <meta name="generator" content="WordPress 6.0">
+    <meta name="framework" content="React">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .test-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 90%;
+        }
+        
+        .tech-badge {
+            display: inline-block;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 20px;
+            padding: 8px 16px;
+            margin: 4px;
+            font-size: 14px;
+            color: #495057;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .feature-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="text-center mb-4">
+            <h1 class="display-4 fw-bold text-primary">🔍 Tech Stack Analyzer</h1>
+            <p class="lead text-muted">插件功能测试页面</p>
+        </div>
+        
+        <div class="alert alert-info" role="alert">
+            <h5 class="alert-heading">📋 测试说明</h5>
+            <p class="mb-0">这个页面包含了多种技术栈特征，用于测试插件的检测能力。请使用插件分析此页面。</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <h3>🎯 预期检测结果</h3>
+                <div class="mb-3">
+                    <h6>前端框架:</h6>
+                    <span class="tech-badge">Bootstrap</span>
+                    <span class="tech-badge">jQuery (如果检测到)</span>
+                </div>
+                
+                <div class="mb-3">
+                    <h6>CDN服务:</h6>
+                    <span class="tech-badge">jsDelivr</span>
+                    <span class="tech-badge">Google Fonts</span>
+                </div>
+                
+                <div class="mb-3">
+                    <h6>分析工具:</h6>
+                    <span class="tech-badge">Google Analytics (模拟)</span>
+                </div>
+                
+                <div class="mb-3">
+                    <h6>Meta信息:</h6>
+                    <span class="tech-badge">WordPress (模拟)</span>
+                    <span class="tech-badge">React (模拟)</span>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <h3>🧪 测试步骤</h3>
+                <ol class="list-group list-group-numbered">
+                    <li class="list-group-item">点击插件图标打开弹窗</li>
+                    <li class="list-group-item">点击"分析当前页面"按钮</li>
+                    <li class="list-group-item">等待分析完成</li>
+                    <li class="list-group-item">查看检测结果</li>
+                    <li class="list-group-item">验证历史记录功能</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h5>🤖 AI分析</h5>
+                <p>测试AI提供商的分析能力</p>
+            </div>
+            
+            <div class="feature-card">
+                <h5>🔍 本地检测</h5>
+                <p>验证本地模式识别功能</p>
+            </div>
+            
+            <div class="feature-card">
+                <h5>📊 历史记录</h5>
+                <p>测试分析结果保存功能</p>
+            </div>
+            
+            <div class="feature-card">
+                <h5>⚙️ 配置管理</h5>
+                <p>验证设置保存和加载</p>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <button class="btn btn-primary btn-lg" onclick="runTests()">
+                🚀 开始测试
+            </button>
+        </div>
+        
+        <div id="test-results" class="mt-4" style="display: none;">
+            <h4>📈 测试结果</h4>
+            <div id="results-content" class="alert alert-secondary">
+                测试结果将显示在这里...
+            </div>
+        </div>
+    </div>
+    
+    <!-- 模拟jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- 模拟Google Analytics -->
+    <script>
+        // 模拟gtag函数
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'GA_MEASUREMENT_ID');
+    </script>
+    
+    <!-- 模拟React特征 -->
+    <script>
+        // 模拟React DevTools
+        window.__REACT_DEVTOOLS_GLOBAL_HOOK__ = {};
+        
+        // 添加一些React相关的DOM属性
+        document.addEventListener('DOMContentLoaded', function() {
+            document.body.setAttribute('data-reactroot', '');
+        });
+    </script>
+    
+    <script>
+        function runTests() {
+            const resultsDiv = document.getElementById('test-results');
+            const resultsContent = document.getElementById('results-content');
+            
+            resultsDiv.style.display = 'block';
+            resultsContent.innerHTML = `
+                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                正在运行测试...请使用插件分析此页面
+            `;
+            
+            // 模拟测试过程
+            setTimeout(() => {
+                resultsContent.innerHTML = `
+                    <h6>✅ 页面特征检查</h6>
+                    <ul class="mb-3">
+                        <li>Bootstrap CSS: 已加载</li>
+                        <li>jQuery: 已加载</li>
+                        <li>Google Fonts: 已加载</li>
+                        <li>Meta标签: 已设置</li>
+                        <li>模拟Analytics: 已初始化</li>
+                    </ul>
+                    
+                    <div class="alert alert-success">
+                        <strong>测试准备完成！</strong><br>
+                        现在请使用Tech Stack Analyzer插件分析此页面，验证检测结果是否与预期一致。
+                    </div>
+                `;
+            }, 2000);
+        }
+        
+        // 页面加载完成后的初始化
+        $(document).ready(function() {
+            console.log('jQuery loaded and ready');
+            
+            // 添加一些动态内容来测试检测
+            $('body').append('<div id="dynamic-content" style="display:none;">Dynamic content loaded with jQuery</div>');
+        });
+    </script>
+</body>
+</html>
+

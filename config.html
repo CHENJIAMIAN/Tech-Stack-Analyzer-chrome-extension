@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tech Stack Analyzer - 配置</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8f9fa;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .header h1 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      color: #666;
+      font-size: 16px;
+    }
+
+    .section {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #4285f4;
+    }
+
+    .provider-config {
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      transition: border-color 0.3s ease;
+    }
+
+    .provider-config:hover {
+      border-color: #4285f4;
+    }
+
+    .provider-config.enabled {
+      border-color: #34a853;
+      background: #f8fff9;
+    }
+
+    .provider-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
+
+    .provider-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #4285f4;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+      outline: none;
+      border-color: #4285f4;
+      box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+    }
+
+    .form-group small {
+      color: #666;
+      font-size: 12px;
+      margin-top: 5px;
+      display: block;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-right: 10px;
+    }
+
+    .btn-primary {
+      background: #4285f4;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #3367d6;
+    }
+
+    .btn-secondary {
+      background: #f8f9fa;
+      color: #5f6368;
+      border: 1px solid #dadce0;
+    }
+
+    .btn-secondary:hover {
+      background: #e8eaed;
+    }
+
+    .btn-test {
+      background: #34a853;
+      color: white;
+    }
+
+    .btn-test:hover {
+      background: #2d8f47;
+    }
+
+    .status-message {
+      padding: 12px;
+      border-radius: 4px;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    .status-success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .status-error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .status-info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+
+    .actions {
+      text-align: center;
+      padding-top: 20px;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🔍 Tech Stack Analyzer 配置</h1>
+      <p>配置AI提供商和分析参数</p>
+    </div>
+
+    <div id="status-container"></div>
+
+    <!-- AI提供商配置 -->
+    <div class="section">
+      <h2 class="section-title">AI提供商配置</h2>
+      
+      <!-- OpenAI -->
+      <div class="provider-config" data-provider="openai">
+        <div class="provider-header">
+          <span class="provider-name">OpenAI GPT</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="openai-enabled">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="grid">
+          <div class="form-group">
+            <label for="openai-api-key">API Key</label>
+            <input type="password" id="openai-api-key" placeholder="sk-...">
+            <small>从 OpenAI 控制台获取 API Key</small>
+          </div>
+          <div class="form-group">
+            <label for="openai-model">模型</label>
+            <input type="text" id="openai-model" placeholder="gpt-4-turbo">
+            <small>输入您想使用的模型名称</small>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="openai-base-url">Base URL (可选)</label>
+          <input type="text" id="openai-base-url" placeholder="https://api.openai.com/v1">
+          <small>如使用代理或第三方服务，请修改此URL</small>
+        </div>
+        <button class="btn btn-test">测试连接</button>
+      </div>
+
+      <!-- Google Gemini -->
+      <div class="provider-config" data-provider="gemini">
+        <div class="provider-header">
+          <span class="provider-name">Google Gemini</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="gemini-enabled">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="grid">
+          <div class="form-group">
+            <label for="gemini-api-key">API Key</label>
+            <input type="password" id="gemini-api-key" placeholder="AIza...">
+            <small>从 Google AI Studio 获取 API Key</small>
+          </div>
+          <div class="form-group">
+            <label for="gemini-model">模型</label>
+            <input type="text" id="gemini-model" placeholder="gemini-pro">
+            <small>输入您想使用的模型名称</small>
+          </div>
+        </div>
+        <button class="btn btn-test">测试连接</button>
+      </div>
+
+      <!-- Anthropic Claude -->
+      <div class="provider-config" data-provider="claude">
+        <div class="provider-header">
+          <span class="provider-name">Anthropic Claude</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="claude-enabled">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="grid">
+          <div class="form-group">
+            <label for="claude-api-key">API Key</label>
+            <input type="password" id="claude-api-key" placeholder="sk-ant-...">
+            <small>从 Anthropic 控制台获取 API Key</small>
+          </div>
+          <div class="form-group">
+            <label for="claude-model">模型</label>
+            <input type="text" id="claude-model" placeholder="claude-3-opus-20240229">
+            <small>输入您想使用的模型名称</small>
+          </div>
+        </div>
+        <button class="btn btn-test">测试连接</button>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary">保存配置</button>
+      <button class="btn btn-secondary">重置为默认</button>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+</body>
+</html>
+
