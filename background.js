@@ -73,11 +73,12 @@ class TechStackAnalyzer {
     try {
       switch (request.action) {
         case 'analyzeCurrentPage':
-          const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+          const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+          const tab =tabs[0]
           if (!tab) {
             throw new Error("无法找到有效的活动标签页。");
           }
-          const result = await this.analyzeCurrentPage(tab.id, request.settings);
+          const result = await this.analyzeCurrentPage(tab.id, request.settings, request.forceNew);
           // 保存到历史记录
           if (result) {
              await this.historyManager.saveAnalysis(result);
@@ -145,7 +146,7 @@ class TechStackAnalyzer {
   }
 
   // 分析当前页面
-  async analyzeCurrentPage(tabId, settingsFromRequest) {
+  async analyzeCurrentPage(tabId, settingsFromRequest, forceNew = false) {
     try {
       // 获取页面HTML
       const html = await this.getPageHTML(tabId);
@@ -153,8 +154,8 @@ class TechStackAnalyzer {
       // 优先用外部传入的 settings
       const settings = settingsFromRequest || await this.getSettings();
       
-      // 调用AI分析
-      const analysis = await this.callAIAnalysis(html, settings);
+      // 调用AI分析，传递 forceNew
+      const analysis = await this.callAIAnalysis(html, settings, forceNew);
       
       return analysis;
     } catch (error) {
@@ -185,34 +186,29 @@ class TechStackAnalyzer {
   }
 
   // 调用AI分析
-  async callAIAnalysis(pageData, settings) {
+  async callAIAnalysis(pageData, settings, forceNew = false) {
     try {
-      // 首先进行本地检测
+      // 只用HTML和settings进行AI分析，不传递本地检测结果
+      const enhancedAnalysis = await this.aiManager.analyzeWithAI(
+        pageData.html, 
+        settings,
+        forceNew
+      );
+      return {
+        url: pageData.url,
+        title: pageData.title,
+        aiAnalysis: enhancedAnalysis,
+        analysis: enhancedAnalysis,
+        timestamp: new Date().toISOString(),
+        provider: settings.defaultProvider
+      };
+    } catch (error) {
+      // AI分析失败时，回退本地检测
       const localDetection = this.localDetector.detect(pageData.html, {
         scripts: pageData.scripts || [],
         stylesheets: pageData.stylesheets || [],
         metaTags: pageData.metaTags || []
       });
-
-      // 将本地检测结果传递给AI进行增强分析
-      const enhancedAnalysis = await this.aiManager.analyzeWithAI(
-        pageData.html, 
-        settings, 
-        localDetection
-      );
-      
-      return {
-        url: pageData.url,
-        title: pageData.title,
-        localDetection: localDetection,
-        aiAnalysis: enhancedAnalysis,
-        analysis: this.combineAnalysis(localDetection, enhancedAnalysis),
-        timestamp: new Date().toISOString(),
-        provider: settings.defaultProvider
-      };
-    } catch (error) {
-      // 如果AI分析失败，至少返回本地检测结果
-      const localDetection = this.localDetector.detect(pageData.html);
       return {
         url: pageData.url,
         title: pageData.title,

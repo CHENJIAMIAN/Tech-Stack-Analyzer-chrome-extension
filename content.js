@@ -148,7 +148,7 @@ class ContentAnalyzer {
     });
 
     button.addEventListener('click', () => {
-      this.triggerAnalysis();
+      this.triggerAnalysis(false);
     });
 
     // 检查是否已存在按钮
@@ -166,7 +166,7 @@ class ContentAnalyzer {
   }
 
   // 触发分析
-  async triggerAnalysis() {
+  async triggerAnalysis(forceNew = false) {
     try {
       // 显示加载状态
       this.showLoadingState();
@@ -184,10 +184,11 @@ class ContentAnalyzer {
       });
       const settings = { ...defaultSettings, ...(rawSettings || {}) };
 
-      // 发送分析请求到background script，带上最新settings
+      // 发送分析请求到background script，带上最新settings和forceNew
       const response = await chrome.runtime.sendMessage({
         action: 'analyzeCurrentPage',
-        settings // 这里带上最新配置
+        settings, // 这里带上最新配置
+        forceNew  // 新增字段，标记是否强制重新生成
       });
 
       if (response.success) {
@@ -301,7 +302,7 @@ class ContentAnalyzer {
         <strong>分析时间:</strong> ${new Date(data.timestamp).toLocaleString()}<br>
         <strong>AI提供商:</strong> ${data.provider}
       </div>
-      <div style="background: #f5f5f5; padding: 15px; border-radius: 4px; white-space: pre-wrap; font-family: monospace; font-size: 14px;">${data.analysis}</div>
+      <div style="background: #f5f5f5; padding: 15px; border-radius: 4px; white-space: pre-wrap; font-family: monospace; font-size: 14px;">${DOMPurify.sanitize(marked.parse(data.analysis))}</div>
     `;
 
     modal.appendChild(content);
@@ -315,7 +316,7 @@ class ContentAnalyzer {
     // 绑定重新生成事件
     document.getElementById('regenerate-analysis').addEventListener('click', () => {
       modal.remove();
-      this.triggerAnalysis();
+      this.triggerAnalysis(true);
     });
 
     modal.addEventListener('click', (e) => {

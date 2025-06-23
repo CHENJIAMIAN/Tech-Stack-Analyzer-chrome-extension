@@ -8,13 +8,14 @@ class AIApiManager {
   }
 
   // 调用AI分析
-  async analyzeWithAI(html, settings, localDetection = null) {
-    const cacheKey = this.generateCacheKey(html, settings, localDetection);
-    
-    // 检查缓存
-    const cachedResult = this.getFromCache(cacheKey);
-    if (cachedResult) {
-      return cachedResult;
+  async analyzeWithAI(html, settings, forceNew = false) {
+    const cacheKey = this.generateCacheKey(html, settings);
+    // forceNew 为 true 时跳过缓存
+    if (!forceNew) {
+      const cachedResult = this.getFromCache(cacheKey);
+      if (cachedResult) {
+        return cachedResult;
+      }
     }
 
     const provider = settings.aiProviders[settings.defaultProvider];
@@ -23,7 +24,7 @@ class AIApiManager {
       throw new Error('请先配置AI提供商');
     }
 
-    const prompt = this.buildAnalysisPrompt(html, settings.analysisDepth, localDetection);
+    const prompt = this.buildAnalysisPrompt(html, settings.analysisDepth);
     
     let lastError;
     for (let attempt = 1; attempt <= this.retryAttempts; attempt++) {
@@ -214,28 +215,19 @@ class AIApiManager {
   }
 
   // 构建分析提示词
-  buildAnalysisPrompt(html, depth, localDetection = null) {
+  buildAnalysisPrompt(html, depth) {
     // 清理和截取HTML内容
     const cleanHtml = this.cleanHtml(html);
+    console.log({cleanHtml});
     
-    let localDetectionInfo = '';
-    if (localDetection) {
-      localDetectionInfo = `
-
-本地检测已识别的技术栈：
-${JSON.stringify(localDetection, null, 2)}
-
-请基于本地检测结果进行验证和补充，纠正可能的错误，并添加本地检测无法识别的技术。`;
-    }
-    
-    const basePrompt = `请分析以下HTML代码，识别网站使用的技术栈，并用自然语言详细说明分析结果。${localDetectionInfo}\n\nHTML内容（已截取关键部分）：\n${cleanHtml}`;
+    const basePrompt = `请分析以下HTML代码，识别网站使用的技术栈，并用自然语言详细说明分析结果。\n\nHTML内容（已截取关键部分）：\n${cleanHtml}`;
 
     if (depth === 'comprehensive') {
-      return basePrompt + `\n\n请提供全面详细的分析，包括：\n1. 技术版本信息（如果可以检测到）\n2. 架构模式分析\n3. 性能优化建议\n4. 安全性评估\n5. 技术选型合理性分析\n6. 与本地检测结果的对比和验证`;
+      return basePrompt + `\n\n请提供全面详细的分析，包括：\n1. 技术版本信息（如果可以检测到）\n2. 架构模式分析\n3. 性能优化建议\n4. 安全性评估\n5. 技术选型合理性分析`;
     } else if (depth === 'detailed') {
-      return basePrompt + `\n\n请提供详细的分析，包括：\n1. 主要技术识别和版本\n2. 架构特点\n3. 基本的性能和安全评估\n4. 验证和补充本地检测结果`;
+      return basePrompt + `\n\n请提供详细的分析，包括：\n1. 主要技术识别和版本\n2. 架构特点\n3. 基本的性能和安全评估`;
     } else {
-      return basePrompt + `\n\n请提供基础的技术栈识别，重点关注主要的前端和后端技术，并验证本地检测结果的准确性。`;
+      return basePrompt + `\n\n请提供基础的技术栈识别，重点关注主要的前端和后端技术。`;
     }
   }
 
@@ -276,12 +268,16 @@ ${JSON.stringify(localDetection, null, 2)}
     return extracted.substring(0, 8000);
   }
 
+  // 工具：UTF-8字符串转Base64，兼容中文
+  utf8ToBase64(str) {
+    return btoa(unescape(encodeURIComponent(str)));
+  }
+
   // 生成缓存键
-  generateCacheKey(html, settings, localDetection = null) {
+  generateCacheKey(html, settings) {
     const content = html.substring(0, 1000); // 使用HTML前1000字符
     const config = `${settings.defaultProvider}-${settings.analysisDepth}`;
-    const localInfo = localDetection ? JSON.stringify(localDetection).substring(0, 200) : '';
-    return btoa(content + config + localInfo).substring(0, 50);
+    return this.utf8ToBase64(content + config).substring(0, 50);
   }
 
   // 获取缓存

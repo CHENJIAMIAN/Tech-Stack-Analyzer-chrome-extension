@@ -23,7 +23,7 @@ function setupEventListeners() {
 
   // 头部按钮
   document.getElementById('export-json-btn').addEventListener('click', () => exportHistory('json'));
-  document.getElementById('export-csv-btn').addEventListener('click', () => exportHistory('csv'));
+//   document.getElementById('export-csv-btn').addEventListener('click', () => exportHistory('csv'));
   document.getElementById('clear-history-btn').addEventListener('click', clearAllHistory);
 
   // 历史记录列表事件委托
@@ -179,6 +179,9 @@ function showDetailModal(item) {
   const modalBody = document.getElementById('modal-body');
   
   modalTitle.textContent = item.title;
+
+  const unsafeHtml = marked.parse(item.analysis || '');
+  const safeAnalysisHtml = DOMPurify.sanitize(unsafeHtml);
   
   modalBody.innerHTML = `
     <div style="margin-bottom: 20px;">
@@ -198,7 +201,7 @@ function showDetailModal(item) {
     
     <div>
       <h4>完整分析结果</h4>
-      <div class="analysis-content">${escapeHtml(item.analysis)}</div>
+      <div class="analysis-content">${safeAnalysisHtml}</div>
     </div>
   `;
   
@@ -252,11 +255,11 @@ async function clearAllHistory() {
       await loadStatistics();
       showSuccess('历史记录已清空');
     } else {
-      showError('清空失败');
+      showError('清空历史记录失败');
     }
   } catch (error) {
     console.error('清空失败:', error);
-    showError('清空失败');
+    showError('清空历史记录失败');
   }
 }
 
@@ -270,14 +273,15 @@ async function exportHistory(format) {
     
     if (response.success) {
       const exportData = response.data;
-      downloadFile(exportData.content, exportData.filename, exportData.mimeType);
+      const mimeType = format === 'json' ? 'application/json' : 'text/csv';
+      downloadFile(exportData.content, exportData.filename, mimeType);
       showSuccess(`导出成功: ${exportData.filename}`);
     } else {
-      showError('导出失败');
+      showError(`导出${format.toUpperCase()}失败`);
     }
   } catch (error) {
     console.error('导出失败:', error);
-    showError('导出失败');
+    showError(`导出${format.toUpperCase()}失败`);
   }
 }
 
@@ -306,29 +310,26 @@ function showError(message) {
 
 // 显示提示消息
 function showToast(message, type = 'info') {
-  const toast = document.createElement('div');
-  toast.style.cssText = `
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: ${type === 'error' ? '#f44336' : type === 'success' ? '#4caf50' : '#2196f3'};
-    color: white;
-    padding: 12px 20px;
-    border-radius: 4px;
-    z-index: 10000;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    max-width: 300px;
-  `;
+  const toastId = 'toast-notification';
+  let toast = document.getElementById(toastId);
+  if (toast) {
+    toast.remove();
+  }
+  
+  toast = document.createElement('div');
+  toast.id = toastId;
+  toast.className = `toast toast-${type}`;
   toast.textContent = message;
   
   document.body.appendChild(toast);
   
   setTimeout(() => {
-    toast.remove();
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 300);
   }, 3000);
 }
 
-// HTML转义
+// HTML转义，防止XSS
 function escapeHtml(unsafe) {
   return unsafe
     .replace(/&/g, "&amp;")

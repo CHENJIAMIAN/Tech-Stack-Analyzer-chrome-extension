@@ -140,12 +140,14 @@ document.addEventListener("DOMContentLoaded", () => {
     function displayResult (data) {
         resultSection.classList.remove("hidden")
         let formattedResult = data.analysis.trim()
+        const unsafeHtml = marked.parse(formattedResult)
+        const safeHtml = DOMPurify.sanitize(unsafeHtml)
         resultContainer.innerHTML = `
       <p><strong>网站:</strong> ${data.title || "N/A"}</p>
       <p><strong>URL:</strong> ${data.url}</p>
       <p><strong>AI提供商:</strong> ${data.provider}</p>
       <p><strong>时间:</strong> ${new Date(data.timestamp).toLocaleString()}</p>
-      <pre>${escapeHtml(formattedResult)}</pre>
+      <div>${safeHtml}</div>
     `
     }
 
