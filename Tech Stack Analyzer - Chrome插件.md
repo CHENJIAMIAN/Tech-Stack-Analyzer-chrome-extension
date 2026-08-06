@@ -1,5 +1,7 @@
 # Tech Stack Analyzer - Chrome插件
 
+> [English](<Tech Stack Analyzer - Chrome插件.en.md>)
+
 🔍 一个利用AI技术分析网站技术栈的Chrome浏览器插件，支持多种AI API提供商。
 
 ## 功能特点

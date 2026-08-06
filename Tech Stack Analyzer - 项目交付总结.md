@@ -1,5 +1,7 @@
 # Tech Stack Analyzer - 项目交付总结
 
+> [English](<Tech Stack Analyzer - 项目交付总结.en.md>)
+
 ## 项目概述
 
 Tech Stack Analyzer 是一个功能完整的Chrome浏览器插件，利用AI技术智能分析网站的技术栈。该插件结合了本地检测和AI分析两种方式，为用户提供准确、详细的技术栈识别服务。
